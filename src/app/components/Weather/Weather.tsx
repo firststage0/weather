@@ -8,12 +8,13 @@ const listOfCities = ["Москва", "Воронеж", "Самара", "Сан�
 export const Weather = () => {
   
   const [cityName, setCityName] = useState<string | null>(listOfCities[0]);
-  const [dataRes, setDataRes] = useState<any>();
+  const [weatherData, setWeatherData] = useState<any>();
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-
-  	const apiURL = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`;
+    setIsLoading(true);
+    
+      const apiURL = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`;
     fetch(apiURL)
       .then(res => {
         if (!res.ok){
@@ -22,12 +23,13 @@ export const Weather = () => {
         return res.json();
       })
       .then(data => {
-        setDataRes(data);
-        console.log(data);
+        setWeatherData(data);
+        setIsLoading(false);
       })
       .catch(error => {
         console.error("Error: ", error);
       })
+      
   }, [cityName]);
 
   return (
@@ -43,7 +45,7 @@ export const Weather = () => {
       sx={{ width: 300 }}
       renderInput={(params) => <TextField {...params} label="Город" />} />
 
-      <div >{`Температура в городе ${cityName} составляет ${dataRes?.main.temp} `}</div>
+    {isLoading ? <div>Загрузка...</div> : <div >{`Температура в городе ${cityName} составляет ${weatherData?.main.temp} `}</div>}
     </div>
   
   );
