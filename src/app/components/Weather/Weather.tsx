@@ -11,7 +11,7 @@ export const Weather = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-
+    setIsLoading(true);
   	const apiURL = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`;
     fetch(apiURL)
       .then((res) => {
@@ -22,7 +22,7 @@ export const Weather = () => {
       })
       .then(data => {
         setWeatherData(data);
-        console.log(data);
+        setIsLoading(false);
       })
       .catch((error) => {
         console.error("Error: ", error);
@@ -43,7 +43,7 @@ export const Weather = () => {
         renderInput={(params) => <TextField {...params} label="Город" />}
       />
 
-      <div >{`Температура в городе ${cityName} составляет ${weatherData?.main.temp} `}</div>
+      { isLoading ? <div>Загрузка...</div> : <div >{`Температура в городе ${cityName} составляет ${weatherData?.main.temp} `}</div>}
     </div>
   );
 };
