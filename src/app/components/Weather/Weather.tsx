@@ -45,6 +45,6 @@ export const Weather = () => {
 
       <div >{`Температура в городе ${cityName} составляет ${dataRes?.main.temp} `}</div>
     </div>
-    
+  
   );
 };
