@@ -21,7 +21,7 @@ export const Weather = () => {
         return res.json();
       })
       .then(data => {
-        setDataRes(data);
+        setWeatherData(data);
         console.log(data);
       })
       .catch((error) => {
@@ -43,7 +43,7 @@ export const Weather = () => {
         renderInput={(params) => <TextField {...params} label="Город" />}
       />
 
-      <div >{`Температура в городе ${cityName} составляет ${dataRes?.main.temp} `}</div>
+      <div >{`Температура в городе ${cityName} составляет ${weatherData?.main.temp} `}</div>
     </div>
   );
 };
