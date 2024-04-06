@@ -9,12 +9,15 @@ const apiKey = "57f7df1e3063971e738d4e9c5af1bb15";
 const listOfCities = ["Москва", "Воронеж", "Самара", "Санкт-петербург"];
 export const Weather = () => {
   const [cityName, setCityName] = useState<string | null>(listOfCities[0]);
+
   const [weatherData, setWeatherData] = useState<WeatherRequest>();
+
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     setIsLoading(true);
     const apiURL = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`;
+    
     fetch(apiURL)
       .then((res) => {
         if (!res.ok) {
@@ -22,6 +25,7 @@ export const Weather = () => {
         }
         return res.json();
       })
+
       .then((data: WeatherRequest) => {
         setWeatherData(data);
         setIsLoading(false);
@@ -54,6 +58,7 @@ export const Weather = () => {
         gap: "30px",
       }}
     >
+
       <Autocomplete
         value={cityName}
         onChange={(event: any, newValue: string | null) => {
@@ -67,6 +72,7 @@ export const Weather = () => {
       />
 
       {renderWeatherData()}
+
     </div>
   );
 };
