@@ -1,0 +1,9 @@
+.card {
+  background-color: var(--card-color);
+  color: white;
+  width: 390px;
+  font-weight: "500";
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

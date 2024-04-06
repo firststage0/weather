@@ -2,17 +2,19 @@
 
 import { Autocomplete, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
+import { Card } from "../Card/Card";
+import { WeatherRequest } from "./Weather.types";
 
 const apiKey = "57f7df1e3063971e738d4e9c5af1bb15";
 const listOfCities = ["Москва", "Воронеж", "Самара", "Санкт-петербург"];
 export const Weather = () => {
   const [cityName, setCityName] = useState<string | null>(listOfCities[0]);
-  const [weatherData, setWeatherData] = useState<any>();
+  const [weatherData, setWeatherData] = useState<WeatherRequest>();
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     setIsLoading(true);
-  	const apiURL = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`;
+    const apiURL = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`;
     fetch(apiURL)
       .then((res) => {
         if (!res.ok) {
@@ -20,17 +22,38 @@ export const Weather = () => {
         }
         return res.json();
       })
-      .then(data => {
+      .then((data: WeatherRequest) => {
         setWeatherData(data);
         setIsLoading(false);
       })
       .catch((error) => {
         console.error("Error: ", error);
-      })
+      });
   }, [cityName]);
 
+  const renderWeatherData = () => {
+    switch (true) {
+      case isLoading: {
+        return <div>Загрузка...</div>;
+      }
+      case !!cityName && !!weatherData: {
+        return <Card cityName={cityName} weatherData={weatherData} />;
+      }
+      default:
+        const text = "Тут пусто...";
+        return <div>{text}</div>;
+    }
+  };
+
   return (
-    <div style={{ padding: "20px" }}>
+    <div
+      style={{
+        padding: "20px",
+        display: "flex",
+        flexDirection: "column",
+        gap: "30px",
+      }}
+    >
       <Autocomplete
         value={cityName}
         onChange={(event: any, newValue: string | null) => {
@@ -43,7 +66,7 @@ export const Weather = () => {
         renderInput={(params) => <TextField {...params} label="Город" />}
       />
 
-      { isLoading ? <div>Загрузка...</div> : <div >{`Температура в городе ${cityName} составляет ${weatherData?.main.temp} `}</div>}
+      {renderWeatherData()}
     </div>
   );
 };
