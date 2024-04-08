@@ -13,11 +13,15 @@ export const Weather = () => {
   const [weatherData, setWeatherData] = useState<WeatherRequest>();
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
+  const [geoData, setGeoData] = useState<any>();
   useEffect(() => {
+    const weatherApiURL = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`;
+    executeWeatherRequest(weatherApiURL);
+    getGeolocation();
+  }, [cityName]);
+
+  const executeWeatherRequest = (apiURL: string) => {
     setIsLoading(true);
-    const apiURL = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`;
-    
     fetch(apiURL)
       .then((res) => {
         if (!res.ok) {
@@ -25,15 +29,41 @@ export const Weather = () => {
         }
         return res.json();
       })
-
       .then((data: WeatherRequest) => {
-        setWeatherData(data);
         setIsLoading(false);
+        setWeatherData(data);
+        return data;
       })
       .catch((error) => {
         console.error("Error: ", error);
       });
-  }, [cityName]);
+  };
+
+  const getGeolocation = () => {
+    navigator.geolocation.getCurrentPosition((position) => {
+      reverseLocationData(position.coords.latitude, position.coords.longitude);
+      console.log(position.coords.latitude, position.coords.longitude);
+    });
+  };
+
+  const reverseLocationData = (latitude: number, longtitude: number) => {
+    const geolocationApiURL = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longtitude}`;
+    fetch(geolocationApiURL)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Response for reverseCoordinates function is'nt ok");
+        }
+
+        return res.json();
+      })
+      .then((data) => {
+        setGeoData(data.address.city);
+        console.log(data.address.city);
+      })
+      .catch((error) => {
+        console.error("Error: ", error);
+      });
+  };
 
   const renderWeatherData = () => {
     switch (true) {
@@ -58,7 +88,6 @@ export const Weather = () => {
         gap: "30px",
       }}
     >
-
       <Autocomplete
         value={cityName}
         onChange={(event: any, newValue: string | null) => {
@@ -72,7 +101,7 @@ export const Weather = () => {
       />
 
       {renderWeatherData()}
-
+      <div>{geoData}</div>
     </div>
   );
 };
