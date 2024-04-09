@@ -4,6 +4,7 @@ import { Autocomplete, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Card } from "../Card/Card";
 import { WeatherRequest } from "./Weather.types";
+import { fetcher } from "../Fetcher/Fetcher";
 
 const apiKey = "57f7df1e3063971e738d4e9c5af1bb15";
 const listOfCities = ["Москва", "Воронеж", "Самара", "Санкт-петербург"];
@@ -16,54 +17,38 @@ export const Weather = () => {
   const [geoData, setGeoData] = useState<any>();
   useEffect(() => {
     const weatherApiURL = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`;
-    executeWeatherRequest(weatherApiURL);
-    getGeolocation();
+    const fetchData = async () => {
+      setIsLoading(true);
+      const weatherData = (await fetcher(weatherApiURL)) as WeatherRequest;
+      setWeatherData(weatherData);
+      setIsLoading(false);
+    };
+    cityName && fetchData();
   }, [cityName]);
 
-  const executeWeatherRequest = (apiURL: string) => {
-    setIsLoading(true);
-    fetch(apiURL)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("Response isn`t ok");
-        }
-        return res.json();
-      })
-      .then((data: WeatherRequest) => {
-        setIsLoading(false);
-        setWeatherData(data);
-        return data;
-      })
-      .catch((error) => {
-        console.error("Error: ", error);
-      });
-  };
-
-  const getGeolocation = () => {
+  useEffect(() => {
     navigator.geolocation.getCurrentPosition((position) => {
-      reverseLocationData(position.coords.latitude, position.coords.longitude);
+      const { coords } = position ?? {};
+      const { latitude, longitude } = coords ?? {};
+      const geolocationApiURL = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`;
+      const fetchData = async () => {
+        setIsLoading(true);
+        const geolocationData = await fetcher(geolocationApiURL);
+        const city = geolocationData.address.city;
+
+        // TODO: Переписать по человечески
+
+        if (!listOfCities.includes(city)) {
+          listOfCities.push(city);
+        }
+
+        setCityName(city);
+        setIsLoading(false);
+      };
+      fetchData();
       console.log(position.coords.latitude, position.coords.longitude);
     });
-  };
-
-  const reverseLocationData = (latitude: number, longtitude: number) => {
-    const geolocationApiURL = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longtitude}`;
-    fetch(geolocationApiURL)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("Response for reverseCoordinates function is'nt ok");
-        }
-
-        return res.json();
-      })
-      .then((data) => {
-        setGeoData(data.address.city);
-        console.log(data.address.city);
-      })
-      .catch((error) => {
-        console.error("Error: ", error);
-      });
-  };
+  }, []);
 
   const renderWeatherData = () => {
     switch (true) {
@@ -99,9 +84,7 @@ export const Weather = () => {
         sx={{ width: 300 }}
         renderInput={(params) => <TextField {...params} label="Город" />}
       />
-
       {renderWeatherData()}
-      <div>{geoData}</div>
     </div>
   );
 };
