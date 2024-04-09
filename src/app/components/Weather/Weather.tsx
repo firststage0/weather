@@ -4,7 +4,7 @@ import { Autocomplete, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Card } from "../Card/Card";
 import { WeatherRequest } from "./Weather.types";
-import { fetcher } from "../Fetcher/Fetcher";
+import { fetcher } from "../Fetcher/fetcher";
 
 const apiKey = "57f7df1e3063971e738d4e9c5af1bb15";
 const listOfCities = ["Москва", "Воронеж", "Самара", "Санкт-петербург"];
