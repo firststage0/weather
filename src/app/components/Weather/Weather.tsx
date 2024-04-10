@@ -73,20 +73,6 @@ export const Weather = () => {
     fetchGeolocation();
   }, []);
 
-  // useEffect(() => {
-  //   navigator.permissions.query({ name: "geolocation" }).then((result) => {
-  //     if (result.state === "granted") {
-
-  //         fetchData();
-  //         return position;
-  //       });
-  //       console.log("Granted");
-  //     } else if (result.state === "denied") {
-  //       console.log("Denied");
-  //     }
-  //   });
-  // }, []);
-
   return (
     <div
       style={{
