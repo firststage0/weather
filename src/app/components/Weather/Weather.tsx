@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Card } from "../Card/Card";
 import { WeatherRequest } from "./Weather.types";
 import { fetcher } from "../Fetcher/fetcher";
-
+import Geolocation from "react-native-geolocation-service";
 const apiKey = "57f7df1e3063971e738d4e9c5af1bb15";
 const listOfCities = ["Москва", "Воронеж", "Самара", "Санкт-петербург"];
 export const Weather = () => {
@@ -14,7 +14,7 @@ export const Weather = () => {
   const [weatherData, setWeatherData] = useState<WeatherRequest>();
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [geoData, setGeoData] = useState<any>();
+
   useEffect(() => {
     const weatherApiURL = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`;
     const fetchData = async () => {
@@ -26,29 +26,11 @@ export const Weather = () => {
     cityName && fetchData();
   }, [cityName]);
 
-  useEffect(() => {
-    navigator.geolocation.getCurrentPosition((position) => {
-      const { coords } = position ?? {};
-      const { latitude, longitude } = coords ?? {};
-      const geolocationApiURL = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`;
-      const fetchData = async () => {
-        setIsLoading(true);
-        const geolocationData = await fetcher(geolocationApiURL);
-        const city = geolocationData.address.city;
-
-        // TODO: Переписать по человечески
-
-        if (!listOfCities.includes(city)) {
-          listOfCities.push(city);
-        }
-
-        setCityName(city);
-        setIsLoading(false);
-      };
-      fetchData();
-      console.log(position.coords.latitude, position.coords.longitude);
+  const getGeolocation = () => {
+    Geolocation.getCurrentPosition((position) => {
+      return position;
     });
-  }, []);
+  };
 
   const renderWeatherData = () => {
     switch (true) {
@@ -63,6 +45,47 @@ export const Weather = () => {
         return <div>{text}</div>;
     }
   };
+
+  const fetchGeolocation = () => {
+    console.log("");
+
+    Geolocation.getCurrentPosition(async (position) => {
+      const { coords } = position ?? {};
+      const { latitude, longitude } = coords ?? {};
+      const geolocationApiURL = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`;
+
+      setIsLoading(true);
+      const geolocationData = await fetcher(geolocationApiURL);
+      const city = geolocationData.address.city;
+
+      // TODO: Переписать по человечески
+
+      if (!listOfCities.includes(city)) {
+        listOfCities.push(city);
+      }
+
+      setCityName(city);
+      setIsLoading(false);
+    });
+  };
+
+  useEffect(() => {
+    fetchGeolocation();
+  }, []);
+
+  // useEffect(() => {
+  //   navigator.permissions.query({ name: "geolocation" }).then((result) => {
+  //     if (result.state === "granted") {
+
+  //         fetchData();
+  //         return position;
+  //       });
+  //       console.log("Granted");
+  //     } else if (result.state === "denied") {
+  //       console.log("Denied");
+  //     }
+  //   });
+  // }, []);
 
   return (
     <div
@@ -85,6 +108,18 @@ export const Weather = () => {
         renderInput={(params) => <TextField {...params} label="Город" />}
       />
       {renderWeatherData()}
+      <button
+        onClick={fetchGeolocation}
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          width: "240px",
+          backgroundColor: "black",
+          color: "white",
+        }}
+      >
+        Определить местоположение
+      </button>
     </div>
   );
 };
