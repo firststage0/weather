@@ -6,6 +6,7 @@ import { Card } from "../Card/Card";
 import { WeatherRequest } from "./Weather.types";
 import { fetcher } from "../Fetcher/fetcher";
 import Geolocation from "react-native-geolocation-service";
+import Menu from "../Menu/Menu";
 const apiKey = "57f7df1e3063971e738d4e9c5af1bb15";
 const listOfCities = ["Москва", "Воронеж", "Самара", "Санкт-петербург"];
 export const Weather = () => {
@@ -82,6 +83,7 @@ export const Weather = () => {
         gap: "30px",
       }}
     >
+      <Menu />
       <Autocomplete
         value={cityName}
         onChange={(event: any, newValue: string | null) => {
@@ -93,6 +95,7 @@ export const Weather = () => {
         sx={{ width: 300 }}
         renderInput={(params) => <TextField {...params} label="Город" />}
       />
+
       {renderWeatherData()}
       <button
         onClick={fetchGeolocation}
