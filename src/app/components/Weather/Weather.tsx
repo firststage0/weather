@@ -4,7 +4,8 @@ import { Autocomplete, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Card } from "../Card/Card";
 import { WeatherRequest } from "./Weather.types";
-
+import { fetcher } from "../Fetcher/fetcher";
+import Geolocation from "react-native-geolocation-service";
 const apiKey = "57f7df1e3063971e738d4e9c5af1bb15";
 const listOfCities = ["Москва", "Воронеж", "Самара", "Санкт-петербург"];
 export const Weather = () => {
@@ -15,25 +16,21 @@ export const Weather = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    setIsLoading(true);
-    const apiURL = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`;
-    
-    fetch(apiURL)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("Response isn`t ok");
-        }
-        return res.json();
-      })
-
-      .then((data: WeatherRequest) => {
-        setWeatherData(data);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error: ", error);
-      });
+    const weatherApiURL = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${apiKey}&units=metric`;
+    const fetchData = async () => {
+      setIsLoading(true);
+      const weatherData = (await fetcher(weatherApiURL)) as WeatherRequest;
+      setWeatherData(weatherData);
+      setIsLoading(false);
+    };
+    cityName && fetchData();
   }, [cityName]);
+
+  const getGeolocation = () => {
+    Geolocation.getCurrentPosition((position) => {
+      return position;
+    });
+  };
 
   const renderWeatherData = () => {
     switch (true) {
@@ -49,6 +46,33 @@ export const Weather = () => {
     }
   };
 
+  const fetchGeolocation = () => {
+    console.log("");
+
+    Geolocation.getCurrentPosition(async (position) => {
+      const { coords } = position ?? {};
+      const { latitude, longitude } = coords ?? {};
+      const geolocationApiURL = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`;
+
+      setIsLoading(true);
+      const geolocationData = await fetcher(geolocationApiURL);
+      const city = geolocationData.address.city;
+
+      // TODO: Переписать по человечески
+
+      if (!listOfCities.includes(city)) {
+        listOfCities.push(city);
+      }
+
+      setCityName(city);
+      setIsLoading(false);
+    });
+  };
+
+  useEffect(() => {
+    fetchGeolocation();
+  }, []);
+
   return (
     <div
       style={{
@@ -58,7 +82,6 @@ export const Weather = () => {
         gap: "30px",
       }}
     >
-
       <Autocomplete
         value={cityName}
         onChange={(event: any, newValue: string | null) => {
@@ -70,9 +93,19 @@ export const Weather = () => {
         sx={{ width: 300 }}
         renderInput={(params) => <TextField {...params} label="Город" />}
       />
-
       {renderWeatherData()}
-
+      <button
+        onClick={fetchGeolocation}
+        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          width: "240px",
+          backgroundColor: "black",
+          color: "white",
+        }}
+      >
+        Определить местоположение
+      </button>
     </div>
   );
 };
