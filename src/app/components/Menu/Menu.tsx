@@ -10,9 +10,10 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
+import { useState } from "react";
 
-export default function Menu() {
-  const [open, setOpen] = React.useState(false);
+export const Menu = () => {
+  const [open, setOpen] = useState<boolean>(false);
 
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
@@ -52,4 +53,4 @@ export default function Menu() {
       </Drawer>
     </div>
   );
-}
+};

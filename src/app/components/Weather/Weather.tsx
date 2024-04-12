@@ -6,7 +6,7 @@ import { Card } from "../Card/Card";
 import { WeatherRequest } from "./Weather.types";
 import { fetcher } from "../Fetcher/fetcher";
 import Geolocation from "react-native-geolocation-service";
-import Menu from "../Menu/Menu";
+import { Menu } from "../Menu/Menu";
 const apiKey = "57f7df1e3063971e738d4e9c5af1bb15";
 const listOfCities = ["Москва", "Воронеж", "Самара", "Санкт-петербург"];
 export const Weather = () => {
@@ -97,7 +97,7 @@ export const Weather = () => {
       />
 
       {renderWeatherData()}
-      <button
+      {/* <button
         onClick={fetchGeolocation}
         style={{
           display: "flex",
@@ -108,7 +108,7 @@ export const Weather = () => {
         }}
       >
         Определить местоположение
-      </button>
+      </button> */}
     </div>
   );
 };
