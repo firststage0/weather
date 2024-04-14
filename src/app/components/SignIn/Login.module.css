@@ -1,0 +1,15 @@
+.root {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.card {
+  max-width: 600px;
+  width: 100%;
+  background-color: blue;
+  color: white;
+  border-radius: 15px;
+  padding: 20px;
+}
