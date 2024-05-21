@@ -4,15 +4,15 @@ import Box from "@mui/material/Box";
 import Drawer from "@mui/material/Drawer";
 import Button from "@mui/material/Button";
 import List from "@mui/material/List";
-import Divider from "@mui/material/Divider";
+
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Divider } from "@mui/material";
 
 export const Menu = () => {
   const [open, setOpen] = useState<boolean>(false);
@@ -27,27 +27,31 @@ export const Menu = () => {
         router.push("/signin");
     }
   };
+  const itemsList: string[] = [
+    "Profile",
+    "Favorites",
+    "Settings",
+    "Contact information",
+    "Exit",
+  ];
 
   const DrawerList = (
     <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
       <List>
-        {[
-          "Profile",
-          "Favorites",
-          "Settings",
-          "Contact information",
-          "Exit",
-        ].map((text, index) => (
-          <ListItem
-            key={text}
-            onClick={(text) => handleListItemClick(text, index)}
-            disablePadding
-          >
-            <ListItemButton>
-              <ListItemIcon>{/* TODO: Добавить иконки */}</ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
+        {itemsList.map((text, index: number) => (
+          <>
+            <ListItem
+              key={text}
+              onClick={(text) => handleListItemClick(text, index)}
+              disablePadding
+            >
+              <ListItemButton>
+                <ListItemIcon>{/* TODO: Добавить иконки */}</ListItemIcon>
+                <ListItemText primary={text} />
+              </ListItemButton>
+            </ListItem>
+            {index === 1 && <Divider />}
+          </>
         ))}
       </List>
     </Box>
